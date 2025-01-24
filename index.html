@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="bootstrap-5.3.3/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/styles.css">
+  <title>APIRest-FrontEnd</title>
+</head>
+<body>
+  <div class="container-fluid p-5">
+    <div class="d-flex justify-content-center">
+      <button id="btnOpenModal" class="btn btn-primary">Nuevo usuario</button>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <div class="table-responsive">
+
+      <table class="table w-75 mx-auto my-4">
+        <thead>
+          <tr>
+            <th scope="col">Número de registro</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Apellido</th>
+            <th scope="col">Documento ID</th>
+            <th scope="col">Dirección</th>
+            <th scope="col">Teléfon</th>
+            <th scope="col">Correo</th>
+            <th scope="col">Operación</th>
+          </tr>
+        </thead>
+        <tbody id="tableUsers">
+
+        </tbody>
+      </table>
+      
+    </div>
+    
+  </div>
+
+  <!-- Modal save user -->
+  <dialog id="modal">
+    <form method="dialog">
+      <h2 id="newUserTitle">Nuevo usuario</h2>
+
+      <div class="form-group">
+        <input type="text" class="inputNewUser" name="nameUser" id="nameUser" placeholder="nombre">
+      </div>
+  
+      <div class="form-group">
+        <input type="text" class="inputNewUser" name="lastNameUser" id="lastNameUser" placeholder="apellido">
+      </div>
+  
+      <div class="form-group">
+        <input type="text" class="inputNewUser" name="idDocumentUser" id="idDocumentUser" placeholder="Documento ID">
+      </div>
+
+      <div class="form-group">
+        <input type="text" class="inputNewUser" name="addressUser" id="addressUser" placeholder="Documento ID">
+      </div>
+  
+      <div class="form-group">
+        <input type="text" class="inputNewUser" name="phoneNumberUser" id="phoneNumberUser" placeholder="Teléfono">
+      </div>
+
+      <div class="form-group">
+        <input type="text" class="inputNewUser" name="emailUser" id="emailUser" placeholder="Correo">
+      </div>
+  
+      <button id="btnSaveUser" class="btn btn-success">Guardar</button>
+    </form>
+    <button id="btnCloseModal" class="btn btn-secondary">Cancelar</button>
+  </dialog>
+
+  <script src="javascript/index.js"></script>
+  <script src="bootstrap-5.3.3/js/bootstrap.min.js"></script>
+</body>
+</html>
