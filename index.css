@@ -28,10 +28,10 @@
   border-radius: 0.5em;
 }
 
-#newUserTitle{
+#titleModal{
   margin-left: 7em;
   padding-top: 0.8em;
-  margin-bottom: 1.5em;
+  margin-bottom: 1em;
   color: #000000;
   font-size: 1.6em;
 }
