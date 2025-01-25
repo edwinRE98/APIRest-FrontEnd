@@ -1,106 +1,433 @@
-const tableUsers = document.getElementById("tableUsers");
+//Variables Globales
+const tablaProductosHTML = document.getElementById("tablaProductos");
 const nameUser = document.getElementById("nameUser");
-const lastNameUser = document.getElementById("lastNameUser");
-const idDocumentUser = document.getElementById("idDocumentUser");
-const addressUser = document.getElementById("addressUser");
-const phoneNumberUser = document.getElementById("phoneNumberUser");
+const lastName = document.getElementById("lastName");
+const idDocument = document.getElementById("idDocument");
+const address = document.getElementById("address");
+const phoneNumber = document.getElementById("phoneNumber");
 const emailUser = document.getElementById("emailUser");
-const btnSaveUser = document.getElementById("btnSaveUser");
-let saveUserModal = document.getElementById("titleModal");
-let updateUserModal = document.getElementById("titleModal");
+const btnGuardar = document.getElementById("btnGuardar");
+let modalTitle = document.getElementById("modalTitle");
+let idProductoModificar = 0;
+let listaProductos = []
 
-function updateUser(id){
-  updateUser.innerText = "dgergegfg";
-  //console.log(id);
-  let user = usersList.filter(user => user.idDocument === id);
-  console.log(user[0]);
-}
 
-/*** API consume ***/
 
 //show all users
-showAllUsers();
+obtenerProductos()
 
-let usersList = []
+async function obtenerProductos(){
+    tablaProductosHTML.innerHTML = ''
+    await fetch('http://localhost:8080/api/users/findAll')
+        .then(response =>  response.json())
+        .then(productos => {
+            console.log(productos)
+            listaProductos = productos
+            for(let producto of productos){
 
-async function showAllUsers(){
-  tableUsers.innerHTML =''
-  await fetch('http://localhost:8080/api/users/findAll')
-  .then(response => response.json())
-  .then(users => {
-    console.log(users)
-    usersList = users;
-    for(let user of users){
-      tableUsers.innerHTML +=
-      '<tr>'+
-        '<td>'+user.id+'</td>'+
-        '<td>'+user.name+'</td>'+
-        '<td>'+user.lastName+'</td>'+
-        '<td>'+user.idDocument+'</td>'+
-        '<td>'+user.address+'</td>'+
-        '<td>'+user.phoneNumber+'</td>'+
-        '<td>'+user.email+'</td>'+
-        '<td>'+
-          '<button class="btn btn-warning" id="editUserModal" onclick="updateUser('+user.id+')">Editar</button>'+
-          '<button class="btn btn-danger">Borrar</button>'+
-        '</td>'+
-      '</tr>'
-    }
-  });
+                tablaProductosHTML.innerHTML +=
+                '<tr>'+
+                '    <th scope="row">'+producto.id+'</th>'+
+                '    <td>'+producto.name+'</td>'+
+                '    <td>'+producto.lastName+'</td>'+
+                '    <td>'+producto.idDocument+'</td>'+
+                '    <td>'+producto.address+'</td>'+
+                '    <td>'+producto.phoneNumber+'</td>'+
+                '    <td>'+producto.email+'</td>'+
+                '    <td>'+
+                '        <input type="button" class="btn btn-outline-danger" value="Eliminar" onclick=eliminarProducto('+producto.id+')>'+
+                '        <input type="button" class="btn btn-primary" value="Modificar" onclick=modificarProducto('+producto.id+')>'+
+                '    </td>'+
+                '</tr>'
+            }
+        })
+        .catch((e)=>{
+            console.log(e);
+            alert("Error: " + e)
+        })
 }
 
 //Save user
-btnSaveUser.addEventListener('click',()=>{
-  saveUser()
-})
-
-async function saveUser(){
-  let userQ = {
-    name:nameUser.value,
-    lastName:lastNameUser.value,
-    idDocumen:idDocumentUser.value,
-    address:addressUser.value,
-    phoneNumber:phoneNumberUser.value,
-    email:emailUser.value
+btnGuardar.addEventListener("click", () => {
+  if (modalTitle.innerText === "Modificar Producto") {
+    crearProducto(idProductoModificar);
+  } else if (modalTitle.innerText === "Nuevo usuario") {
+    crearProducto();
   }
-  console.log(userQ)
-  
-  fetch('http://localhost:8080/api/users/save',{
-    method: 'POST',
-    mode: 'cors',
+});
+
+async function crearProducto() {
+  let productoGuardar = {
+    name: nameUser.value,
+    lastName: lastName.value,
+    idDocument: idDocument.value,
+    address: address.value,
+    phoneNumber: phoneNumber.value,
+    email:emailUser.value
+  };
+  console.log(productoGuardar);
+
+  await fetch("http://localhost:8080/api/users/save", {
+    method: "POST",
+    mode: "cors",
     headers: {
-        'Content-Type': 'application/json'
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify(userQ)
+    body: JSON.stringify(productoGuardar),
   })
-  .then((user)=>{
-    console.log(user)
-    alert("Usuario registrado")
-    showAllUsers();
-  })
-  .catch((e)=>{
-    console.log(e)
-    alert(e);
-    showAllUsers();
-  })
+    .then((producto) => {
+      console.log(producto);
+      alert("Usuario registrado");
+      modal.style.display = "none";
+      obtenerProductos();
+      resetModal();
+    })
+    .catch((e) => {
+      console.log(e);
+      alert("Error: " + e);
+    });
 }
 
-/** Modal***/
-const newUserModal = document.querySelector("#newUserModal");
-const editUserModal = document.querySelector("#editUserModal");
-const closeModal = document.querySelector("#btnCloseModal");
-const modal = document.querySelector("#modal");
+//Update user
+function modificarProducto(id) {
+  modalTitle.innerText = "Modificar Producto";
+  modal.style.display = "block";
+  idProductoModificar = id;
+  resetModal();
+  let producto = listaProductos.filter(
+    (producto) => producto.id === id
+  );
+  console.log(producto[0]);
+  nameUser.value = producto[0].name
+  lastName.value = producto[0].lastName
+  idDocument.value = producto[0].idDocument
+  address.value = producto[0].address
+  phoneNumber.value = producto[0].phoneNumber
+  emailUser.value = producto[0].email
+}
 
-newUserModal.addEventListener("click",()=>{
-  saveUserModal.innerText = "Nuevo usuario"
-  modal.showModal();
-});
 
-editUserModal.addEventListener("click",()=>{
-  updateUserModal.innerText = "Nuevo usuario"
-  modal.showModal();
-});
+//Eliminar Producto
+async function eliminarProducto(id) {
+  await fetch("http://localhost:8080/api/users/delete/" + id, {
+    method: "DELETE",
+    mode: "cors",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((res) => {
+      console.log(res);
+      alert("Producto eliminado");
+      obtenerProductos();
+    })
+    .catch((err) => {
+      console.log(err);
+      alert("Lo sentimos no pudimos eliminar el producto");
+    });
+}
 
-closeModal.addEventListener("click",()=>{
-  modal.close();
-});
+
+//Reset Modal
+function resetModal() {
+  nameUser.value = ""
+  lastName.value = ""
+  idDocument.value = ""
+  address.value = ""
+  phoneNumber.value = ""
+  emailUser.value = ""
+}
+
+//Modal
+var modal = document.getElementById("myModal");
+var btn = document.getElementById("myBtn");
+var span = document.getElementsByClassName("close")[0];
+
+btn.onclick = function () {
+  modalTitle.innerText = "Nuevo usuario";
+  modal.style.display = "block";
+};
+span.onclick = function () {
+  modal.style.display = "none";
+  resetModal();
+};
+window.onclick = function (event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+    resetModal();
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// //Variables Globales
+// const tablaProductosHTML = document.getElementById('tablaProductos')
+// const nombre =  document.getElementById('nombre')
+// const precio =  document.getElementById('precio')
+// const cantidad =  document.getElementById('cantidad')
+// const btnGuardar =  document.getElementById('btnGuardar')
+// let tituloModal = document.getElementById('tituloModal')
+// let idProductoModificar = 0
+// //Acciones Guardar Producto
+// btnGuardar.addEventListener('click',()=>{
+//     if(tituloModal.innerText === "Modificar Producto"){
+//         crearProducto(idProductoModificar)
+//     }
+//     else if(tituloModal.innerText === "Crear Producto"){
+//         crearProducto(0)
+//     }
+// })
+
+// //Eliminar Producto
+// async function eliminarProducto(id){
+//     await fetch('http://localhost:8080/api/producto/delete/'+id,{
+//         method: 'DELETE',
+//         mode: 'cors',
+//         headers: {
+//           'Content-Type': 'application/json'
+//         },
+
+//       })
+//       .then((res)=>{
+//         console.log(res);
+//         alert("Producto eliminado")
+//         obtenerProductos()
+//       })
+//       .catch((err)=>{
+//         console.log(err);
+//         alert("Lo sentimos no pudimos eliminar el producto")
+//       })
+// }
+
+// //Modificar Producto
+// function modificarProducto(id){
+//     tituloModal.innerText = "Modificar Producto"
+//     modal.style.display = "block";
+//     idProductoModificar = id
+//     resetModal()
+//     let producto = listaProductos.filter(producto => producto.idproducto === id)
+//     console.log(producto[0]);
+//     nombre.value = producto[0].nombreproducto
+//     precio.value = producto[0].precioproducto
+//     cantidad.value = producto[0].cantidadproducto
+
+// }
+
+// //Crear Prodcuto
+// async function crearProducto(id){
+//     let productoGuardar = {
+//         idproducto:id,
+//         nombreproducto:nombre.value,
+//         precioproducto:parseInt(precio.value),
+//         cantidadproducto:parseInt(cantidad.value),
+//         fecha:fechaHoy()
+//     }
+//     console.log(productoGuardar);
+
+//     await fetch('http://localhost:8080/api/producto/new',{
+//         method: 'POST',
+//         mode: 'cors',
+//         headers: {
+//           'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify(productoGuardar)
+//       })
+//       .then((producto)=>{
+//         console.log(producto);
+//         alert("Producto guardado")
+//         modal.style.display = "none";
+//         obtenerProductos()
+//         resetModal()
+//       })
+//       .catch((err)=>{
+//         console.log(err);
+//         alert("Lo siento no pudimos crear el producto")
+//       })
+
+// }
+// function fechaHoy(){
+//     const currentDate = new Date();
+//     const year = currentDate.getFullYear();
+//     const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+//     const day = String(currentDate.getDate()).padStart(2, '0');
+//     const formattedDate = `${year}-${month}-${day}`;
+//     return formattedDate
+// }
+
+// //Consumo API
+// let listaProductos = []
+// async function obtenerProductos(){
+//     tablaProductosHTML.innerHTML = ''
+//     await fetch('http://localhost:8080/api/producto')
+//         .then(response =>  response.json())
+//         .then(productos => {
+//             console.log(productos)
+//             listaProductos = productos
+//             for(let producto of productos){
+
+//                 tablaProductosHTML.innerHTML +=
+//                 '<tr>'+
+//                 '    <th scope="row">'+producto.idproducto+'</th>'+
+//                 '    <td>'+producto.nombreproducto+'</td>'+
+//                 '    <td>'+producto.precioproducto+'</td>'+
+//                 '    <td>'+producto.cantidadproducto+'</td>'+
+//                 '    <td>'+producto.fecha+'</td>'+
+//                 '    <td>'+
+//                 '        <input type="button" class="btn btn-outline-danger" value="Eliminar" onclick=eliminarProducto('+producto.idproducto+')>'+
+//                 '        <input type="button" class="btn btn-primary" value="Modificar" onclick=modificarProducto('+producto.idproducto+')>'+
+//                 '    </td>'+
+//                 '</tr>'
+//             }
+
+//         })
+//         .catch((err)=>{
+//             console.log(err);
+//             alert("Lo sentimos no pudimos obtener lo productos")
+//         })
+// }
+// obtenerProductos()
+
+// //Reset Modal
+// function resetModal(){
+//     nombre.value = ""
+//     cantidad.value = ""
+//     precio.value = ""
+// }
+
+// //Modal
+// var modal = document.getElementById("myModal");
+// var btn = document.getElementById("myBtn");
+// var span = document.getElementsByClassName("close")[0];
+
+// btn.onclick = function() {
+//     tituloModal.innerText = "Crear Producto"
+//     modal.style.display = "block";
+// }
+// span.onclick = function() {
+//   modal.style.display = "none";
+//   resetModal()
+// }
+// window.onclick = function(event) {
+//   if (event.target == modal) {
+//     modal.style.display = "none";
+//     resetModal()
+//   }
+// }
