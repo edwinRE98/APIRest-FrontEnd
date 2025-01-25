@@ -48,6 +48,7 @@ async function obtenerProductos(){
 }
 
 //Save user
+/*
 btnGuardar.addEventListener("click", () => {
   if (modalTitle.innerText === "Modificar Producto") {
     crearProducto(idProductoModificar);
@@ -55,6 +56,16 @@ btnGuardar.addEventListener("click", () => {
     crearProducto();
   }
 });
+*/
+btnGuardar.addEventListener("click", () => {
+  if (modalTitle.innerText === "Modificar Producto") {
+    crearProducto(idProductoModificar);
+  }
+  else if (modalTitle.innerText === "Nuevo usuario") {
+    crearProducto(0);
+  }
+});
+
 
 async function crearProducto(id) {
   let productoGuardar = {
