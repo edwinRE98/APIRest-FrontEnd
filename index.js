@@ -56,8 +56,9 @@ btnGuardar.addEventListener("click", () => {
   }
 });
 
-async function crearProducto() {
+async function crearProducto(id) {
   let productoGuardar = {
+    id: id,
     name: nameUser.value,
     lastName: lastName.value,
     idDocument: idDocument.value,
